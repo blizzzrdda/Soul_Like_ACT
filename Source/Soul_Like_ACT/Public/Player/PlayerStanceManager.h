@@ -59,6 +59,8 @@ class SOUL_LIKE_ACT_API UPlayerStanceManager : public UActorComponent
 	GENERATED_BODY()
 
 public:
+    DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStanceChanged, EStanceType, StanceType, FPlayerActionSet, PlayerActionSet);
+
 	UPlayerStanceManager();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Stance)
@@ -67,12 +69,24 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = Stance)
 	EStanceType ActiveStance;
 
+	UPROPERTY(BlueprintAssignable)
+	FOnStanceChanged OnStanceChanged;
+	
 	UFUNCTION(BlueprintCallable)
 	void ActivateStance(EStanceType NewStance)
 	{
 		ActiveStance = NewStance;
+		
+		Broadcast_OnStanceChanged();
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FPlayerActionSet GetActiveStanceSet() const;
+
+	UFUNCTION()
+	void Broadcast_OnStanceChanged() const
+	{
+		if(OnStanceChanged.IsBound())
+			OnStanceChanged.Broadcast(ActiveStance, GetActiveStanceSet());
+	}
 };
