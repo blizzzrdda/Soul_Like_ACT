@@ -50,7 +50,7 @@ enum class EFacingOffsetMode : uint8
 {
 	Disabled,
 	Interpolation,
-	Const
+	Instant
 };
 
 struct FRotationCache
@@ -119,7 +119,7 @@ protected:
 
 	void Timer_CheckBlockingAndDistance();
 	bool UpdateRotation_Default(float DeltaTime);
-	bool UpdateRotation_Interp_And_Const(float DeltaTime);
+	bool UpdateRotation_Interp_And_Instant(float DeltaTime);
 
 	void Tick_UpdateRotation(float DeltaTime);
 
@@ -145,6 +145,8 @@ public:
 		OutLockedTarget = LockedTarget;
 	}
 
+	UFUNCTION(BlueprintCallable, Category = Targeting)
+	void SetOffsetForDodging();
 	UFUNCTION(BlueprintCallable, Category = TargetLocking)
 	void SetFacingOffset(EFacingOffsetMode OffsetMode, float OffsetSpeed = 90.f, bool bUseTarget = true, float ToYaw = 0.f);
 	UFUNCTION(BlueprintCallable, Category = TargetLocking)

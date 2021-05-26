@@ -7,7 +7,9 @@
 #include "Soul_Like_ACT.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "TimerManager.h"
+#include "BPFL/BPFL_Math.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Player/SoulPlayerCharacter.h"
 
 
 UPlayerTargetingComponent::UPlayerTargetingComponent()
@@ -43,6 +45,20 @@ void UPlayerTargetingComponent::ToggleCameraLock(bool _bLockCamera)
 	{
 		DisableLockingTarget();
 	}
+}
+
+void UPlayerTargetingComponent::SetOffsetForDodging()
+{
+	float OutDegreeDeviationToForward, OutDegreeDeviationToFourDirection;
+	FVector OutDir;
+
+	ASoulPlayerCharacter::GetSoulPlayerChar(this)->PredictMovement(OutDir, OutDegreeDeviationToForward);
+
+	if(OutDir.IsNearlyZero()) return;
+	
+	UBPFL_Math::GetDeviationToFourDirection(OutDegreeDeviationToForward,OutDegreeDeviationToFourDirection);
+
+	SetFacingOffset(EFacingOffsetMode::Instant, 0.f, false, OutDegreeDeviationToFourDirection);
 }
 
 void UPlayerTargetingComponent::SetFacingOffset(EFacingOffsetMode OffsetMode, float OffsetSpeed, bool bUseTarget,
@@ -347,19 +363,20 @@ bool UPlayerTargetingComponent::UpdateRotation_Default(float DeltaTime)
 	return true;
 }
 
-bool UPlayerTargetingComponent::UpdateRotation_Interp_And_Const(float DeltaTime)
+bool UPlayerTargetingComponent::UpdateRotation_Interp_And_Instant(float DeltaTime)
 {
 	const auto PrevYaw = GetOwner()->GetActorRotation().Yaw;
 
 	// Validate FFacingOffsetContext
-	if (FMath::IsNearlyZero(FacingOffsetContext.OffsetSpeed))
+	if (FacingOffsetMode == EFacingOffsetMode::Interpolation &&
+		FMath::IsNearlyZero(FacingOffsetContext.OffsetSpeed))
 	{
 		LOG_FUNC_ERROR("Speed to low");			
 		return false;
 	}
 
-	float Yaw_Destined = FacingOffsetContext.ToYaw;
 	// Find the destined yaw withOUT delta time involved
+	float Yaw_Destined = FacingOffsetContext.ToYaw;
 	if (FacingOffsetContext.bUseLockedTarget)
 	{
 		if (!LockedTarget)
@@ -373,14 +390,17 @@ bool UPlayerTargetingComponent::UpdateRotation_Interp_And_Const(float DeltaTime)
 	}
 
 	// Calculating delta yaw
-	float Yaw_Delta = Yaw_Destined;
+	float Yaw_Delta = 0.f;
 	if(FacingOffsetMode == EFacingOffsetMode::Interpolation)
 	{
 		Yaw_Delta = UKismetMathLibrary::FInterpTo(PrevYaw, Yaw_Destined, DeltaTime,
 												FacingOffsetContext.OffsetSpeed);
+	}else if (FacingOffsetMode == EFacingOffsetMode::Instant)
+	{
+		Yaw_Delta = Yaw_Destined;
 	}
 	
-	PlayerRef->AddActorLocalRotation(FRotator(0.f, Yaw_Delta - PrevYaw, 0.f));
+	PlayerRef->AddActorLocalRotation(FRotator(0.f, Yaw_Delta, 0.f));
 	
 	// Try clear FacingOffsetContext
     if(UKismetMathLibrary::NearlyEqual_FloatFloat(Yaw_Destined, Yaw_Delta))
@@ -407,8 +427,8 @@ void UPlayerTargetingComponent::Tick_UpdateRotation(float DeltaTime)
 	// Instead, Const mode will ignore the speed
 	// e.g. Facing Offset during attacking
 	else if (FacingOffsetMode == EFacingOffsetMode::Interpolation
-		|| FacingOffsetMode == EFacingOffsetMode::Const)
+		|| FacingOffsetMode == EFacingOffsetMode::Instant)
 	{
-		UpdateRotation_Interp_And_Const(DeltaTime);
+		UpdateRotation_Interp_And_Instant(DeltaTime);
 	}
 }

@@ -218,7 +218,7 @@ public:
     UPROPERTY(BlueprintReadOnly)
 	FGameplayAttributeData Leech_More;
 	ATTRIBUTE_ACCESSORS(USoulAttributeSet, Leech_More)
-	
+
 	UPROPERTY(BlueprintReadOnly)
 	FGameplayAttributeData MoveSpeed;
 	ATTRIBUTE_ACCESSORS(USoulAttributeSet, MoveSpeed)

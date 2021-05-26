@@ -1,6 +1,4 @@
 #include "BPFL/BPFL_Utilities.h"
-
-
 #include "Soul_Like_ACT.h"
 #include "Abilities/SoulAttributeSet.h"
 #include "Abilities/SoulModifierManager.h"

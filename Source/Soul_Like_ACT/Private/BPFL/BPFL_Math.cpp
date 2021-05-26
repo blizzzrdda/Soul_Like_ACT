@@ -46,22 +46,22 @@ void UBPFL_Math::DegreeToFourDirection(float Degree, EFourDirection& Direction)
 		Direction = EFourDirection::Right;
 }
 
-bool UBPFL_Math::GetDeviationToFourDirection(float Degree, float& Deviation)
+bool UBPFL_Math::GetDeviationToFourDirection(float InDeviationToForward, float& OutDeviationToFourDir)
 {
-	if (Degree <= 45.f && Degree > -45.f)
-		Deviation = Degree;
-	else if (Degree <= -45. && Degree > -135.f)
-		Deviation = Degree + 90.f;
-	else if (Degree <= -135.f && Degree >= -180.f)
-		Deviation = Degree + 180.f;
-	else if (Degree >= 45.f && Degree < 135.f)
-		Deviation = Degree - 90.f;
-	else if (Degree >= 135.f && Degree <= 180.f)
-		Deviation = Degree - 180.f;
+	if (InDeviationToForward <= 45.f && InDeviationToForward > -45.f)
+		OutDeviationToFourDir = InDeviationToForward;
+	else if (InDeviationToForward <= -45. && InDeviationToForward > -135.f)
+		OutDeviationToFourDir = InDeviationToForward + 90.f;
+	else if (InDeviationToForward <= -135.f && InDeviationToForward >= -180.f)
+		OutDeviationToFourDir = InDeviationToForward + 180.f;
+	else if (InDeviationToForward >= 45.f && InDeviationToForward < 135.f)
+		OutDeviationToFourDir = InDeviationToForward - 90.f;
+	else if (InDeviationToForward >= 135.f && InDeviationToForward <= 180.f)
+		OutDeviationToFourDir = InDeviationToForward - 180.f;
 	else
 	{
 		LOG_FUNC_FAILURE("Degree out of range")
-		Deviation = 0.f;
+		OutDeviationToFourDir = 0.f;
 
 		return false;
 	}

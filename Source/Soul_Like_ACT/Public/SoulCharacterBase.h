@@ -31,10 +31,10 @@ enum class EActorFaction : uint8
 UENUM(BlueprintType)
 enum class ESoulMovementMode : uint8
 {
-	Idle = 0,
-	Walk = 1,
-	Run = 2,
-	Sprint = 3
+	Idle,
+	Walk,
+	Run,
+	Sprint
 };
 
 UCLASS(Abstract, NotBlueprintable)
@@ -46,6 +46,8 @@ public:
 	ASoulCharacterBase();
 
 protected:
+	ESoulMovementMode MovementMode = ESoulMovementMode::Run;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UWidgetComponent* TargetIcon;
 
@@ -121,13 +123,15 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool GetIsDead() const
 	{
-		return AbilitySystemComponent->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("Effect.Ailment.Dead", true));;
+		return AbilitySystemComponent->
+			HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("Effect.Ailment.Dead", true));;
 	}
 
 	UFUNCTION(BlueprintCallable)
 	bool GetIsStun() const
 	{
-		return AbilitySystemComponent->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("Effect.Ailment.Stun", true));
+		return AbilitySystemComponent->
+			HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("Effect.Ailment.Stun", true));
 	}
 
 	UFUNCTION(BlueprintCallable)
@@ -212,9 +216,6 @@ protected:
 								 ASoulCharacterBase* InstigatorCharacter,
 								 AActor* DamageCauser);
 
-	UFUNCTION(BlueprintNativeEvent)
-	void MakeStepDecelAndSound();
-
 	UPROPERTY()
 	TArray<ASoulCharacterBase*> CounterTargets;
 	UPROPERTY()
@@ -223,20 +224,37 @@ protected:
 	virtual void ForceOverrideFacingDirection(float Alpha) { return; }
 
 public:
-	UFUNCTION(BlueprintCallable)
-	static void MakeStepDecelAndSound_Notify(ASoulCharacterBase* CharacterRef);
-
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	virtual AWeaponActor* GetWeaponActor() { return nullptr; }
 
 	UFUNCTION(BlueprintCallable, category = Movement)
-	virtual ESoulMovementMode GetMovementMode() const;
+	ESoulMovementMode GetMovementMode() const { return MovementMode; }
+
+	UFUNCTION(BlueprintCallable, Category = Movement)
+	float GetMovementModeMultiplier() const
+	{
+		switch (MovementMode)
+		{
+			case ESoulMovementMode::Walk: return .25f;
+			case ESoulMovementMode::Run: return .5f;
+			case ESoulMovementMode::Sprint: return 1.f;
+			default: return 0.f;
+		}
+	}
+
+	UFUNCTION(BlueprintCallable, Category = Movement)
+	void SetMovementMode(ESoulMovementMode InMovementMode)
+	{
+		MovementMode = InMovementMode;
+	}
 
 	UFUNCTION(BlueprintCallable, Category = Direction)
 	void BP_ForceOverrideFacingDirection(float Speed) { return ForceOverrideFacingDirection(Speed); }
 
 	FVector BodySweep_ForwardVec;
+	
 	float SweepingSpeed;
+	
 	/**
 	 * Call the function in ANS_BodySweeping
 	 * If bUseTarget and Target is valid, then it sweeps to the target.

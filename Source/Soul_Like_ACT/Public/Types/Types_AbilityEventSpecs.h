@@ -1,6 +1,22 @@
 ﻿#pragma once
 #include "Types_AbilityEventSpecs.generated.h"
 
+//TODO  
+USTRUCT(BlueprintType)
+struct FHitDirection_
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FVector StartPositionOffset;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FVector EndPositionOffset;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float Width;
+};
+
+
 USTRUCT(BlueprintType)
 struct FAbilityEvent_PushingForceSpecs
 {

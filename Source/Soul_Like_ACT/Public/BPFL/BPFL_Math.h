@@ -41,5 +41,5 @@ public:
      * or when Deviation = 110, then rotate 20 (110-90)
      */
     UFUNCTION(BlueprintCallable, BlueprintPure, Category = Math)
-    static bool GetDeviationToFourDirection(float Degree, float& Deviation);
+    static bool GetDeviationToFourDirection(float InDeviationToForward, float& OutDeviationToFourDir);
 };

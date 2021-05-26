@@ -54,8 +54,6 @@ public:
 
 protected:
 	//Tick------------------------------
-	bool bIsSprintingPressed;
-
 	UFUNCTION()
 	void MoveForward(float Value);
 	UFUNCTION()
@@ -79,9 +77,6 @@ protected:
 		return !(FMath::IsNearlyZero(ForwardAxisValue) && FMath::IsNearlyZero(RightAxisValue));
 	}
 
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	void PredictMovement(FVector& DirectionVec, float& Degree) const;
-
 	UFUNCTION(BlueprintImplementableEvent)
 	void DegreeToMovementMultiplier(const float& Degree, float& Multiplier);
 
@@ -93,13 +88,16 @@ protected:
 	 */
 	virtual void ForceOverrideFacingDirection(float Alpha) override;
 
-	//------------CAMERA---------------
 public:
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	void PredictMovement(FVector& DirectionVec, float& Degree) const;
+
+	//------------CAMERA---------------
 	UFUNCTION(BlueprintCallable, Category = Camera)
 	void GetActiveCameraAndSpringArm(ACameraActor*& ActiveCam, USpringArmComponent*& ActiveSpringArm,
 									 bool& isValid) const;
 	//-----------CAMERA------------------
-public:
+
 	UFUNCTION(BlueprintCallable)
 	void ResetRotation();
 
@@ -115,8 +113,6 @@ public:
 	static ASoulPlayerCharacter* GetSoulPlayerChar(UObject* WorldContextObj);
 	UFUNCTION(BlueprintCallable, BlueprintPure, meta = (WorldContext = "WorldContext"), Category = TargetLockingComponent)
 	static class UPlayerTargetingComponent* GetPlayerTargetLockingComponent(UObject* WorldContextObject);
-
-	virtual ESoulMovementMode GetMovementMode() const override;
 
 	UFUNCTION(BlueprintCallable, meta=( DeprecatedNode), Category = Camera)
 	void SetCameraMode(bool bFreeCamera) { _bFreeCamera = bFreeCamera; }

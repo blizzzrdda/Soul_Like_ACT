@@ -97,25 +97,6 @@ void ASoulCharacterBase::HandlePostureDamage(float PostureDamageAmount, const bo
 	OnPostureDamaged(PostureDamageAmount, IsCriticaled, HitInfo, DamageTags, InstigatorCharacter, DamageCauser);
 }
 
-void ASoulCharacterBase::MakeStepDecelAndSound_Notify(ASoulCharacterBase* CharacterRef)
-{
-	CharacterRef->MakeStepDecelAndSound();
-}
-
-ESoulMovementMode ASoulCharacterBase::GetMovementMode() const
-{
-	const float SpeedProportion = GetVelocity().Size() / AttributeSet->GetMoveSpeed();
-
-	if (FMath::IsNearlyZero(SpeedProportion))
-		return ESoulMovementMode::Idle;
-	if (SpeedProportion <= 0.3f)
-		return ESoulMovementMode::Walk;
-	if (SpeedProportion <= 0.6f)
-		return ESoulMovementMode::Run;
-	
-	return ESoulMovementMode::Sprint;
-}
-
 bool ASoulCharacterBase::BodySweep_Init(const AActor* Target, bool bUseTarget, float InSweepingSpeed)
 {
 	BodySweep_ForwardVec = FVector::ZeroVector;
@@ -160,11 +141,6 @@ void ASoulCharacterBase::BodySweep_Finished()
 {
 	GetCapsuleComponent()->SetEnableGravity(false);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-}
-
-void ASoulCharacterBase::MakeStepDecelAndSound_Implementation()
-{
-	return;
 }
 
 UAbilitySystemComponent* ASoulCharacterBase::GetAbilitySystemComponent() const

@@ -279,18 +279,6 @@ UPlayerTargetingComponent* ASoulPlayerCharacter::GetPlayerTargetLockingComponent
 	return PlayerChar->TargetingComponent;
 }
 
-ESoulMovementMode ASoulPlayerCharacter::GetMovementMode() const
-{
-	// //No input -> idle
-	// if (FMath::IsNearlyZero(ForwardAxisValue) && FMath::IsNearlyZero(RightAxisValue))
-	//     return ESoulMovementMode::Idle;
-	//
-	// if (GetMesh()->GetAnimInstance()->IsAnyMontagePlaying())
-	//     return  ESoulMovementMode::Idle;
-	//
-	return Super::GetMovementMode();
-}
-
 //TODO this should be disabled when TPS mode
 void ASoulPlayerCharacter::TurnAtRate(float Rate)
 {
@@ -390,8 +378,9 @@ void ASoulPlayerCharacter::MakeMove()
 
 		// const float MoveMulti = (TargetingComponent->GetIsTargetingEnabled() ? 0.6f : 1.f) * (bIsSprintingPressed ? 1.f : 0.6f) * DegreeMulti;
 
-		const float MoveMulti = (bIsSprintingPressed ? 1.f : 0.6f) * MoveSpeedMulti_Velocity;
-
+		const float MoveMulti = GetMovementModeMultiplier() * MoveSpeedMulti_Velocity;
+		// const float MoveMulti = GetMovementModeMultiplier();
+		
 		AddMovementInput(Direction, MoveMulti);
 	}
 }
