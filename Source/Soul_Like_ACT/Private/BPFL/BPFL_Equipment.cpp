@@ -25,10 +25,10 @@ bool UBPFL_Equipment::StanceToSocketName(EStanceType Stance, FName& OutSocketNam
 			OutSocketName = FName("Soc_Top");
 			break;
 		case EStanceType::Middle:
-			OutSocketName = FName("Soc_Mid");
+			OutSocketName = FName("Soc_Top");
 			break;
 		case EStanceType::Low:
-			OutSocketName = FName("Soc_Low");
+			OutSocketName = FName("Soc_Top");
 			break;
 		default:
 			return false;;
