@@ -21,7 +21,7 @@ private:
 public:
     UInventoryComponent();
 
-    UPROPERTY(VisibleAnywhere, Category = Inventory)
+    UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = Inventory)
     TArray<FInventoryItem> InventoryItems;
 
     /**

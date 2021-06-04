@@ -170,11 +170,6 @@ void UEquipmentManager::AddItem_Unsafe(const FInventoryItem& InItem, FInventoryI
     OutItem = Equipments[Index];
     Equipments[Index] = InItem;
 
-    //Update modifiers and abilities
-    auto MM = UBPFL_Utilities::GetModifierManager(this);
-    if(MM)  MM->UpdateAbilitiesAndModifiers();
-    else    LOG_FUNC_FAILURE("Cannot find SoulModifierManager")
-
     //Update world actor
     if(InItem.IsValid() && InItem.ItemBase->ItemType == USoulAssetManager::WeaponItemType)
     {
@@ -189,11 +184,6 @@ void UEquipmentManager::RemoveItem_Unsafe(EEquipmentSlot Slot, FInventoryItem& O
     OutItem = Equipments[static_cast<uint8>(Slot)];
     Equipments[static_cast<uint8>(Slot)] = FInventoryItem();
 
-    //Update modifiers and abilities
-    auto MM = UBPFL_Utilities::GetModifierManager(this);
-    if(MM)  MM->UpdateAbilitiesAndModifiers();
-    else    LOG_FUNC_FAILURE("Cannot find SoulModifierManager")
-
     //remove world actor
     UpdateWeaponActor(nullptr);
     
@@ -204,4 +194,9 @@ void UEquipmentManager::Notify_OnEquipmentChanged(EEquipmentSlot EquipSlot) cons
 {
     if(OnEquipmentChanged.IsBound())
         OnEquipmentChanged.Broadcast(static_cast<int32>(EquipSlot));
+        
+    //Update modifiers and abilities
+    auto MM = UBPFL_Utilities::GetModifierManager(GetWorld());
+    if(MM)  MM->UpdateAbilitiesAndModifiers();
+    else    LOG_FUNC_FAILURE("Cannot find SoulModifierManager")
 }

@@ -91,13 +91,15 @@ void USoulModifierManager::UpdateActiveAbilities()
 
 void USoulModifierManager::UpdateModifiers()
 {
-	// todo support mobs
 	auto EM = GetOwner()->GetComponentByClass(UEquipmentManager::StaticClass());
+	if(!EM)
+		EM = GetWorld()->GetFirstPlayerController()->GetComponentByClass(UEquipmentManager::StaticClass());
 	if (!EM)
 	{
 		LOG_FUNC_ERROR("Cannot find EquipmentManager");
 		return;
 	}
+
 	auto ASC =
 		USoulAbilitySystemComponent::GetAbilitySystemComponentFromActor(GetWorld()->GetFirstPlayerController()->
 																		GetPawn());
@@ -121,8 +123,6 @@ void USoulModifierManager::UpdateModifiers()
 		UBPFL_ItemMaker::GetModifiersOfItem(Gear, ModifiersToInit, _garbage1, _garbage2, EmptySlots);
 	}
 
-	if (!UBPFL_Utilities::MergeModifierArray(ModifiersToInit))
-		return;
 
 	//Cancel current ModifierAbilities
 	for (auto AbilityHandle : GrantedModifiers)
@@ -130,6 +130,7 @@ void USoulModifierManager::UpdateModifiers()
 
 	GrantedModifiers.Reset();
 
+	UBPFL_Utilities::MergeModifierArray(ModifiersToInit);
 	//Init new modifiers
 	for (auto NewModifier : ModifiersToInit)
 	{
