@@ -8,10 +8,31 @@
 #include "Types/PlayerMoveSet.h"
 #include "PlayerStanceManager.generated.h"
 
+UENUM(BlueprintType)
+enum class EInputTypeForAction : uint8
+{
+	X,
+	Y,
+	B,
+	A,
+	LT,
+	RT,
+	AttackLT_X,
+	AttackLT_Y
+};
+
 USTRUCT(BlueprintType)
 struct SOUL_LIKE_ACT_API FPlayerActionSet
 {
 	GENERATED_BODY()
+
+	FPlayerActionSet()
+		:DirectActions_DEPRECATED()
+	{
+	}
+
+	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TMap<EInputTypeForAction, TSubclassOf<UActiveAbility>> DirectActions_DEPRECATED;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<UActiveAbility> Step;

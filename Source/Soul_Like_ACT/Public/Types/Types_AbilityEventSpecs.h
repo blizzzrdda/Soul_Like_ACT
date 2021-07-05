@@ -3,7 +3,7 @@
 
 //TODO  
 USTRUCT(BlueprintType)
-struct FHitDirection_
+struct FAbilityEvent_HitDirection
 {
 	GENERATED_BODY()
 

@@ -4,6 +4,7 @@
 #include "Abilities/SoulAttributeSet.h"
 #include "SoulCharacterBase.h"
 #include "AbilitySystemComponent.h"
+#include "GameplayTagBook.h"
 #include "BPFL/BPFL_Math.h"
 
 struct SoulDamageStatics
@@ -143,11 +144,12 @@ void USoulReflectionDamageExecution::Execute_Implementation(
     //If source actor is perfectly parrying -> reflect 1x damage and posture damage and proc stun
     //If normal parrying -> reflect .4x
     //else .25x
-    if (SourceTags->HasTagExact(FGameplayTag::RequestGameplayTag(FName{"Buffer.Parry.Perfect"}, true)))
+    if (SourceTags->HasTagExact(NGameplayTagBook::ParryPerfect))
     {
-        Spec->DynamicAssetTags.AddTagFast(FGameplayTag::RequestGameplayTag(FName{"Damage.Stun"}, true));
+    	// todo stun back?
+        // Spec->DynamicAssetTags.AddTagFast(FGameplayTag::RequestGameplayTag(FName{"Damage.Stun"}, true));
     }
-    else if (SourceTags->HasTagExact(FGameplayTag::RequestGameplayTag(FName{"Buffer.Parry.Normal"}, true)))
+    else if (SourceTags->HasTagExact(NGameplayTagBook::ParryPerNormal))
     {
         PostureDamageDone *= .4f;
         DamageDone *= .4f;
@@ -238,7 +240,7 @@ void USoulDamageExecution::Execute_Implementation(const FGameplayEffectCustomExe
 
     if (CriticalStrike >= TempCritRoll)
     {
-        Spec->DynamicAssetTags.AddTagFast(FGameplayTag::RequestGameplayTag(FName{"Damage.Critical"}, true));
+        Spec->DynamicAssetTags.AddTagFast(NGameplayTagBook::DamageCritical);
         DamageDone *=  (1 + CriticalMulti / 100.f);
     }
 
@@ -258,16 +260,16 @@ void USoulDamageExecution::Execute_Implementation(const FGameplayEffectCustomExe
     if (TargetTags->HasTag(FGameplayTag::RequestGameplayTag(FName{"Buffer.Parry"}, true)) && FMath::Abs(CuttingAngle) <
         90.f)
     {
-        if (TargetTags->HasTagExact(FGameplayTag::RequestGameplayTag(FName{"Buffer.Parry.Perfect"}, true)))
+        if (TargetTags->HasTagExact(NGameplayTagBook::ParryPerfect))
         {
             //Warning: Pass the tag through the GE, just in case the Parry's GA ends before the Notify_OnMeleeAttack is triggered;
-            Spec->DynamicAssetTags.AddTagFast(FGameplayTag::RequestGameplayTag(FName{"Buffer.Parry.Perfect"}, true));
+            Spec->DynamicAssetTags.AddTagFast(NGameplayTagBook::ParryPerfect);
 
             PostureDamageDone = DamageDone = 0.f;
         }
-        else if (TargetTags->HasTagExact(FGameplayTag::RequestGameplayTag(FName{"Buffer.Parry.Normal"}, true)))
+        else if (TargetTags->HasTagExact(NGameplayTagBook::ParryPerNormal))
         {
-            Spec->DynamicAssetTags.AddTagFast(FGameplayTag::RequestGameplayTag(FName{"Buffer.Parry.Normal"}, true));
+            Spec->DynamicAssetTags.AddTagFast(NGameplayTagBook::ParryPerNormal);
 
             DamageDone *= 0.25f;
             PostureDamageDone *= .25f;
@@ -281,9 +283,9 @@ void USoulDamageExecution::Execute_Implementation(const FGameplayEffectCustomExe
 
         PostureDamageDone = DamageDone = 0.f;
     }
-    else if (!Spec->DynamicAssetTags.HasTagExact(FGameplayTag::RequestGameplayTag(FName{"Damage.Stun"}, true)))
+    else if (!Spec->DynamicAssetTags.HasTagExact(NGameplayTagBook::ReactionStun))
     {
-        Spec->DynamicAssetTags.AddTagFast(FGameplayTag::RequestGameplayTag(FName{"Damage.Stun"}, true));
+        Spec->DynamicAssetTags.AddTagFast(NGameplayTagBook::ReactionStun);
     }
 
     //Passed the critical tag to the gameplay effect spec
